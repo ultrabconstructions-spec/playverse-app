@@ -89,13 +89,30 @@ export default function VideosPage() {
 
                 {/* THUMBNAIL */}
 
-                <img
-                  src={
-                    video.thumbnail_url ||
-                    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"
-                  }
-                  className="w-full h-[260px] object-cover group-hover:scale-110 transition duration-700"
-                />
+               <div className="relative w-full h-[260px] overflow-hidden">
+
+  {/* THUMBNAIL */}
+
+  <img
+    src={
+      video.thumbnail_url ||
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"
+    }
+    className="absolute inset-0 w-full h-full object-cover group-hover:opacity-0 transition duration-500"
+  />
+
+  {/* VIDEO PREVIEW */}
+
+  <video
+    src={`https://stream.mux.com/${video.playback_id}.m3u8`}
+    muted
+    autoPlay
+    loop
+    playsInline
+    className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition duration-500"
+  />
+
+</div>
 
                 {/* HOVER OVERLAY */}
 
