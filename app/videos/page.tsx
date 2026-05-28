@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import Link from "next/link";
+
+import { motion } from "framer-motion";
 
 import { supabase } from "@/lib/supabase";
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<any[]>([]);
+
+  const [featured, setFeatured] = useState<any>(null);
 
   useEffect(() => {
     fetchVideos();
@@ -20,105 +25,177 @@ export default function VideosPage() {
 
     if (data) {
       setVideos(data);
+
+      if (data.length > 0) {
+        setFeatured(data[0]);
+      }
     }
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-black text-white overflow-hidden">
 
-      {/* NAVBAR */}
+      {/* HERO */}
 
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-zinc-800">
+      {featured && (
 
-        <Link
-          href="/"
-          className="text-4xl font-black text-red-600"
-        >
-          PlayVerse
-        </Link>
+        <section className="relative h-screen w-full overflow-hidden">
 
-        <div className="flex gap-4">
+          {/* VIDEO BACKGROUND */}
 
-          <Link
-            href="/upload"
-            className="bg-red-600 hover:bg-red-700 px-5 py-3 rounded-xl font-bold transition"
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
           >
-            Upload
-          </Link>
+            <source
+              src={`https://stream.mux.com/${featured.playback_id}.m3u8`}
+            />
+          </video>
 
-          <Link
-            href="/profile"
-            className="bg-zinc-800 hover:bg-zinc-700 px-5 py-3 rounded-xl font-bold transition"
-          >
-            Profile
-          </Link>
+          {/* OVERLAY */}
+
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent" />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
+
+          {/* NAVBAR */}
+
+          <nav className="absolute top-0 left-0 w-full z-50 flex items-center justify-between px-10 py-8">
+
+            <Link
+              href="/"
+              className="text-5xl font-black text-red-600 tracking-tight"
+            >
+              PlayVerse
+            </Link>
+
+            <div className="flex gap-5">
+
+              <Link
+                href="/upload"
+                className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-2xl font-black transition"
+              >
+                Upload
+              </Link>
+
+              <Link
+                href="/profile"
+                className="bg-zinc-800/80 backdrop-blur-xl hover:bg-zinc-700 px-6 py-3 rounded-2xl font-black transition"
+              >
+                Profile
+              </Link>
+
+            </div>
+
+          </nav>
+
+          {/* FEATURED CONTENT */}
+
+          <div className="relative z-20 h-full flex items-center px-10">
+
+            <div className="max-w-3xl">
+
+              <motion.h1
+                initial={{ opacity: 0, y: 60 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1 }}
+                className="text-6xl md:text-8xl font-black leading-none mb-8"
+              >
+                {featured.title}
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-zinc-300 text-2xl mb-10 max-w-2xl"
+              >
+                Experience next-generation creator streaming on PlayVerse.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="flex flex-wrap gap-5"
+              >
+
+                <Link
+                  href={`/watch/${featured.id}`}
+                  className="bg-white text-black px-10 py-5 rounded-2xl text-2xl font-black hover:scale-105 transition"
+                >
+                  ▶ Watch Now
+                </Link>
+
+                <button className="bg-zinc-800/80 backdrop-blur-xl px-10 py-5 rounded-2xl text-2xl font-black hover:bg-zinc-700 transition">
+                  + My List
+                </button>
+
+              </motion.div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      )}
+
+      {/* TRENDING */}
+
+      <section className="relative z-30 -mt-32 px-10 pb-24">
+
+        <div className="mb-10">
+
+          <h2 className="text-5xl font-black mb-3">
+            Trending Now
+          </h2>
+
+          <p className="text-zinc-400 text-xl">
+            Most watched creator content
+          </p>
 
         </div>
 
-      </nav>
-
-      {/* HEADER */}
-
-      <section className="px-8 py-16">
-
-        <h1 className="text-5xl md:text-7xl font-black mb-6">
-          Trending Videos
-        </h1>
-
-        <p className="text-zinc-400 text-xl">
-          Stream creator content on PlayVerse.
-        </p>
-
-      </section>
-
-      {/* VIDEOS */}
-
-      <section className="px-8 pb-20">
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {videos.map((video) => (
+          {videos.map((video, index) => (
 
-            <Link
+            <motion.div
               key={video.id}
-              href={`/watch/${video.id}`}
-              className="group"
+              initial={{ opacity: 0, y: 80 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
             >
 
-              <div className="relative overflow-hidden rounded-[30px] bg-zinc-900 border border-zinc-800 hover:border-red-600 transition duration-300">
+              <Link
+                href={`/watch/${video.id}`}
+                className="group block"
+              >
 
-                {/* THUMBNAIL */}
+                <div className="relative overflow-hidden rounded-[35px] bg-zinc-900 border border-zinc-800 hover:border-red-600 hover:scale-105 transition duration-500 shadow-2xl">
 
-               <div className="relative w-full h-[260px] overflow-hidden">
+                  {/* VIDEO PREVIEW */}
 
-  {/* THUMBNAIL */}
+                  <video
+                    src={`https://stream.mux.com/${video.playback_id}.m3u8`}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    className="w-full h-[500px] object-cover"
+                  />
 
-  <img
-    src={
-      video.thumbnail_url ||
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"
-    }
-    className="absolute inset-0 w-full h-full object-cover group-hover:opacity-0 transition duration-500"
-  />
+                  {/* OVERLAY */}
 
-  {/* VIDEO PREVIEW */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-  <video
-    src={`https://stream.mux.com/${video.playback_id}.m3u8`}
-    muted
-    autoPlay
-    loop
-    playsInline
-    className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition duration-500"
-  />
+                  {/* CONTENT */}
 
-</div>
-
-                {/* HOVER OVERLAY */}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-end p-6">
-
-                  <div>
+                  <div className="absolute bottom-0 left-0 p-6 w-full">
 
                     <div className="flex items-center gap-3 mb-4">
 
@@ -130,27 +207,31 @@ export default function VideosPage() {
 
                       )}
 
-                      <div className="text-sm text-zinc-300">
+                      <div className="bg-black/70 backdrop-blur-xl px-3 py-1 rounded-full text-sm">
                         {video.views || 0} views
                       </div>
 
                     </div>
 
-                    <h2 className="text-2xl font-black mb-3">
+                    <h3 className="text-3xl font-black mb-4">
                       {video.title}
-                    </h2>
+                    </h3>
 
-                    <button className="bg-white text-black px-5 py-2 rounded-xl font-black">
-                      ▶ Watch
-                    </button>
+                    <div className="opacity-0 group-hover:opacity-100 transition">
+
+                      <button className="bg-white text-black px-5 py-3 rounded-xl font-black">
+                        ▶ Play
+                      </button>
+
+                    </div>
 
                   </div>
 
                 </div>
 
-              </div>
+              </Link>
 
-            </Link>
+            </motion.div>
 
           ))}
 
