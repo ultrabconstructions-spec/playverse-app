@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "PlayVerse",
-  description: "Next generation streaming platform",
+  description: "Streaming Platform",
 };
 
 export default function RootLayout({
