@@ -1,22 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+
 import { supabase } from "@/lib/supabase";
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchVideos();
-  }, [search]);
+  }, []);
 
   async function fetchVideos() {
     const { data } = await supabase
       .from("videos")
       .select("*")
-      .ilike("title", `%${search}%`)
       .order("created_at", { ascending: false });
 
     if (data) {
@@ -38,7 +37,7 @@ export default function VideosPage() {
           PlayVerse
         </Link>
 
-        <div className="flex items-center gap-5">
+        <div className="flex gap-4">
 
           <Link
             href="/upload"
@@ -48,220 +47,99 @@ export default function VideosPage() {
           </Link>
 
           <Link
-            href="/login"
+            href="/profile"
             className="bg-zinc-800 hover:bg-zinc-700 px-5 py-3 rounded-xl font-bold transition"
           >
-            Login
+            Profile
           </Link>
 
         </div>
 
       </nav>
 
-      {/* HERO */}
+      {/* HEADER */}
 
-      <section className="relative h-[70vh] flex items-center px-10 overflow-hidden">
+      <section className="px-8 py-16">
 
-        <img
-          src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=2000&auto=format&fit=crop"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        />
+        <h1 className="text-5xl md:text-7xl font-black mb-6">
+          Trending Videos
+        </h1>
 
-        <div className="relative z-10 max-w-3xl">
-
-          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
-            Unlimited Streaming
-            <br />
-            For Creators
-          </h1>
-
-          <p className="text-zinc-300 text-xl mb-8">
-            Watch premium creator videos, gaming content,
-            AI entertainment and live streams.
-          </p>
-
-          <div className="flex gap-5">
-
-            <Link
-              href="/upload"
-              className="bg-red-600 hover:bg-red-700 px-8 py-4 rounded-2xl font-bold text-lg transition"
-            >
-              Start Uploading
-            </Link>
-
-            <Link
-              href="/videos"
-              className="bg-zinc-800 hover:bg-zinc-700 px-8 py-4 rounded-2xl font-bold text-lg transition"
-            >
-              Browse Videos
-            </Link>
-
-          </div>
-
-        </div>
+        <p className="text-zinc-400 text-xl">
+          Stream creator content on PlayVerse.
+        </p>
 
       </section>
 
-      {/* SEARCH */}
+      {/* VIDEOS */}
 
-      <section className="px-8 py-10">
+      <section className="px-8 pb-20">
 
-        <input
-          type="text"
-          placeholder="Search videos..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-zinc-900 border border-zinc-800 p-5 rounded-2xl text-white outline-none"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-      </section>
-
-      {/* TRENDING */}
-
-      <section className="px-8 pb-16">
-
-        <div className="flex items-center justify-between mb-8">
-
-          <h2 className="text-4xl font-black">
-            Trending Now
-          </h2>
-
-          <p className="text-zinc-400">
-            {videos.length} Videos
-          </p>
-
-        </div>
-
-        {videos.length === 0 ? (
-
-          <div className="bg-zinc-900 rounded-3xl p-20 text-center">
-
-            <h3 className="text-3xl font-bold mb-4">
-              No Videos Yet
-            </h3>
-
-            <p className="text-zinc-400 mb-8">
-              Upload your first video to PlayVerse.
-            </p>
+          {videos.map((video) => (
 
             <Link
-              href="/upload"
-              className="bg-red-600 hover:bg-red-700 px-8 py-4 rounded-2xl font-bold inline-block transition"
+              key={video.id}
+              href={`/watch/${video.id}`}
+              className="group"
             >
-              Upload Video
-            </Link>
 
-          </div>
+              <div className="relative overflow-hidden rounded-[30px] bg-zinc-900 border border-zinc-800 hover:border-red-600 transition duration-300">
 
-        ) : (
+                {/* THUMBNAIL */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <img
+                  src={
+                    video.thumbnail_url ||
+                    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"
+                  }
+                  className="w-full h-[260px] object-cover group-hover:scale-110 transition duration-700"
+                />
 
-            {videos.map((video) => (
+                {/* HOVER OVERLAY */}
 
-              <Link
-                key={video.id}
-                href={`/watch/${video.id}`}
-                className="group"
-              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 flex items-end p-6">
 
-                <div className="relative overflow-hidden rounded-3xl bg-zinc-900">
+                  <div>
 
-                  {/* PREMIUM BADGE */}
+                    <div className="flex items-center gap-3 mb-4">
 
-                  {video.premium && (
+                      {video.premium && (
 
-                    <div className="absolute top-4 left-4 z-20 bg-red-600 px-3 py-1 rounded-full text-xs font-black">
-                      PREMIUM
-                    </div>
+                        <div className="bg-red-600 px-3 py-1 rounded-full text-xs font-black">
+                          PREMIUM
+                        </div>
 
-                  )}
+                      )}
 
-                  {/* THUMBNAIL */}
-
-                  <div className="overflow-hidden">
-
-                    <img
-                      src={
-                        video.thumbnail_url ||
-                        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"
-                      }
-                      className="w-full h-[240px] object-cover group-hover:scale-110 transition duration-500"
-                    />
-
-                  </div>
-
-                  {/* CONTENT */}
-
-                  <div className="p-5">
-
-                    <h3 className="text-xl font-bold mb-3 line-clamp-1">
-                      {video.title}
-                    </h3>
-
-                    <div className="flex items-center justify-between text-zinc-400 text-sm">
-
-                      <span>
+                      <div className="text-sm text-zinc-300">
                         {video.views || 0} views
-                      </span>
-
-                      <span>
-                        Play Now
-                      </span>
+                      </div>
 
                     </div>
+
+                    <h2 className="text-2xl font-black mb-3">
+                      {video.title}
+                    </h2>
+
+                    <button className="bg-white text-black px-5 py-2 rounded-xl font-black">
+                      ▶ Watch
+                    </button>
 
                   </div>
 
                 </div>
 
-              </Link>
+              </div>
 
-            ))}
-
-          </div>
-
-        )}
-
-      </section>
-
-      {/* CATEGORIES */}
-
-      <section className="px-8 pb-20">
-
-        <h2 className="text-4xl font-black mb-10">
-          Categories
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-
-          {[
-            "Gaming",
-            "AI Videos",
-            "Live Streams",
-            "Technology",
-          ].map((cat) => (
-
-            <div
-              key={cat}
-              className="bg-zinc-900 hover:bg-zinc-800 rounded-3xl p-10 text-center text-2xl font-bold transition cursor-pointer"
-            >
-              {cat}
-            </div>
+            </Link>
 
           ))}
 
         </div>
 
       </section>
-
-      {/* FOOTER */}
-
-      <footer className="border-t border-zinc-800 py-10 text-center text-zinc-500">
-
-        © 2026 PlayVerse. All rights reserved.
-
-      </footer>
 
     </main>
   );
